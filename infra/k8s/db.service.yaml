@@ -1,0 +1,75 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: db-srv
+
+spec:
+  selector:
+    app: db
+  ports:
+    - port: 5432
+      targetPort: 5432
+      name: db
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: db
+
+spec:
+  selector:
+    matchLabels:
+      app: db
+  serviceName: db-srv
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: db
+    spec:
+      containers:
+        - name: db
+          image: postgres:14-alpine
+          ports:
+            - containerPort: 5432
+              name: db
+          env:
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
+            - name: POSTGRES_USER
+              value: postgres
+            - name: POSTGRES_PASSWORD
+              value: secret
+            - name: POSTGRES_DB
+              value: saas_shared
+          livenessProbe:
+            exec:
+              command:
+                [
+                  "psql",
+                  "-U",
+                  "postgres",
+                  "-d",
+                  "saas_shared",
+                  "-c",
+                  "SELECT 1",
+                ]
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+          readinessProbe:
+            exec:
+              # Check we can execute queries over TCP (skip-networking is off).
+              command:
+                [
+                  "psql",
+                  "-U",
+                  "postgres",
+                  "-d",
+                  "saas_shared",
+                  "-c",
+                  "SELECT 1",
+                ]
+            initialDelaySeconds: 5
+            periodSeconds: 2
+            timeoutSeconds: 1

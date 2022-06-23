@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-depl
+
+spec:
+  selector:
+    matchLabels:
+      app: api
+  template:
+    metadata:
+      labels:
+        app: api
+
+    spec:
+      containers:
+        - name: api
+          image: advent_demo_saas_api
+          env:
+            - name: DATABASE_URL
+              value: postgresql://postgres:secret@db-srv:5432/saas_shared
+            - name: DATABASE_BASE_URL
+              value: postgresql://postgres:secret@db-srv:5432
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+          ports:
+            - containerPort: 5000
+      initContainers:
+        - name: init-db
+          image: busybox:1.28
+          command:
+            [
+              "sh",
+              "-c",
+              "until nslookup db-srv; do echo waiting for databases; sleep 2; done;",
+            ]

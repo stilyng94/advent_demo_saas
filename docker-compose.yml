@@ -1,0 +1,66 @@
+version: "3"
+
+services:
+  nginx-proxy:
+    image: jwilder/nginx-proxy:alpine
+    restart: always
+    container_name: nginx
+    ports:
+      - "80:80"
+      # - "443:443"
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      # - ./certs:/etc/nginx/certs:ro
+      # - ./vhost.d:/etc/nginx/vhost.d
+      # - ./html:/usr/share/nginx/html
+      # - ./conf.d:/etc/nginx/conf.d
+
+
+  db:
+    image: postgres:14-alpine
+    env_file: ./sample-saas/.env
+    container_name: db
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    restart: on-failure
+    environment:
+      - PGDATA=/var/lib/postgresql/data/pgdata
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=secret
+      - POSTGRES_DB=saas_shared
+    ports:
+      - "5432:5432"
+
+  api:
+    build:
+      context: ./sample-saas
+      dockerfile: Dockerfile
+    container_name: api
+    restart: always
+    env_file: ./sample-saas/.env
+    environment:
+      - DATABASE_URL=postgresql://postgres:secret@db:5432/saas_shared
+      - DATABASE_BASE_URL=postgresql://postgres:secret@db:5432
+      - VIRTUAL_HOST=saas-advent.com
+      - VIRTUAL_PATH=/api/
+    entrypoint: [ "./scripts/entrypoint.sh" ]
+    command: [ "yarn", "start" ]
+    ports:
+      - "5000:80"
+    depends_on:
+      - db
+  web:
+    build:
+      context: ./toolkit_tut
+      dockerfile: Dockerfile
+    container_name: frontend
+    restart: always
+    env_file: ./toolkit_tut/.env
+    environment:
+      - VIRTUAL_HOST=saas-advent.com,*.saas-advent.com
+      - VIRTUAL_PATH=/
+    ports:
+      - "8080:80"
+
+volumes:
+  pgdata:

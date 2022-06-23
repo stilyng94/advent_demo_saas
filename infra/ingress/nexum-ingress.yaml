@@ -1,0 +1,29 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: advent-saas-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+
+  namespace: nexum
+spec:
+  rules:
+    - host: "nexum.saas-advent.dev"
+      http:
+        paths:
+          - path: "/api/?(.*)"
+            pathType: Prefix
+            backend:
+              service:
+                name: api-srv
+                port:
+                  number: 5000
+          - path: "/?(.*)"
+            pathType: Prefix
+            backend:
+              service:
+                name: web-srv
+                port:
+                  number: 5001
+  ingressClassName: nginx
