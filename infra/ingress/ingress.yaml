@@ -43,5 +43,22 @@ spec:
                 name: web-srv
                 port:
                   number: 5001
+    - host: "app.saas-advent.dev"
+      http:
+        paths:
+          - path: "/api/ind/?(.*)"
+            pathType: Prefix
+            backend:
+              service:
+                name: api-srv
+                port:
+                  number: 5000
+          - path: "/?(.*)"
+            pathType: Prefix
+            backend:
+              service:
+                name: web-srv
+                port:
+                  number: 5001
 
   ingressClassName: nginx

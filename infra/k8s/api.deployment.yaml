@@ -27,6 +27,7 @@ spec:
               cpu: "500m"
           ports:
             - containerPort: 5000
+
       initContainers:
         - name: init-db
           image: busybox:1.28
