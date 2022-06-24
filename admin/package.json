@@ -8,7 +8,9 @@
     "start": "pm2-runtime start ecosystem.config.js --json --only api",
     "route": "ts-node ./src/route53.ts",
     "build": "tsc",
-    "generate:tenant": "npx prisma generate"
+    "create:tenant:database": "npx prisma db push --schema ./prisma/schema.tenant.prisma --skip-generate",
+    "create:admin:database": "npx prisma db push --skip-generate",
+    "generate:admin": "npx prisma generate"
   },
   "devDependencies": {
     "@types/continuation-local-storage": "^3.2.4",

@@ -7,7 +7,7 @@ function App() {
   const nameRef = useRef<HTMLInputElement>(null);
   const newTenant = (name: string) => {
     axios
-      .post(`${process.env.REACT_APP_BASE_URL}/api/new`, { name })
+      .post(`${process.env.REACT_APP_BASE_URL}/api/onboard`, { name })
       .then((data) => alert(JSON.stringify(data)))
       .catch((e) => console.log(e));
   };
