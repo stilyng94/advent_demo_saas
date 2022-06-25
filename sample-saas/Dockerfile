@@ -1,4 +1,4 @@
-FROM node:lts-alpine3.16@sha256:c785e617c8d7015190c0d41af52cc69be8a16e3d9eb7cb21f0bb58bcfca14d6b as builder
+FROM node:lts-alpine3.16@sha256:9da65f99264be2a78682095c4789b3d8cab12e0012def7d937d7125ed6e7695c as builder
 
 RUN mkdir -p /usr/app/node_modules && chown -R node:node  /usr/app
 
@@ -25,7 +25,7 @@ RUN yarn generate:tenant
 RUN yarn build
 
 #----- Staging
-FROM node:lts-alpine3.16@sha256:c785e617c8d7015190c0d41af52cc69be8a16e3d9eb7cb21f0bb58bcfca14d6b as stager
+FROM node:lts-alpine3.16@sha256:9da65f99264be2a78682095c4789b3d8cab12e0012def7d937d7125ed6e7695c as stager
 
 WORKDIR /usr/app
 
@@ -50,7 +50,7 @@ RUN yarn install --prod && \
 
 
 #----- Production
-FROM node:lts-alpine3.16@sha256:c785e617c8d7015190c0d41af52cc69be8a16e3d9eb7cb21f0bb58bcfca14d6b as prod
+FROM node:lts-alpine3.16@sha256:9da65f99264be2a78682095c4789b3d8cab12e0012def7d937d7125ed6e7695c as prod
 RUN mkdir -p /usr/app/node_modules && chown -R node:node  /usr/app
 
 WORKDIR /usr/app
