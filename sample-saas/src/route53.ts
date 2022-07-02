@@ -1,7 +1,7 @@
 import AWS from "aws-sdk";
 
-const accessKeyId = "AKIAYQCFSF6RMJUQXXFI";
-const secretAccessKey = "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";
+const accessKeyId = process.env.AWS_ACCESS_KEY;
+const secretAccessKey = process.env.AWS_SECRET_KEY;
 
 AWS.config.update({
   accessKeyId,
