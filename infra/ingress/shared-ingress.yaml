@@ -11,54 +11,19 @@ spec:
     - host: "saas-advent.dev"
       http:
         paths:
-          - path: "/api/?(.*)"
+          - path: "/api/*"
             pathType: Prefix
             backend:
               service:
-                name: api-srv
+                name: shared-api-srv
                 port:
                   number: 5000
-          - path: "/?(.*)"
+          - path: "/*"
             pathType: Prefix
             backend:
               service:
-                name: web-srv
-                port:
-                  number: 5001
-
-    - host: "admin.saas-advent.dev"
-      http:
-        paths:
-          - path: "/api/?(.*)"
-            pathType: Prefix
-            backend:
-              service:
-                name: api-srv
+                name: landing-web-srv
                 port:
                   number: 5000
-          - path: "/?(.*)"
-            pathType: Prefix
-            backend:
-              service:
-                name: web-srv
-                port:
-                  number: 5001
-    - host: "app.saas-advent.dev"
-      http:
-        paths:
-          - path: "/api/ind/?(.*)"
-            pathType: Prefix
-            backend:
-              service:
-                name: api-srv
-                port:
-                  number: 5000
-          - path: "/?(.*)"
-            pathType: Prefix
-            backend:
-              service:
-                name: web-srv
-                port:
-                  number: 5001
 
   ingressClassName: nginx

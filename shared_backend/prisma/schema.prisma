@@ -1,0 +1,125 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model PlanHistory {
+  id       String @id @default(uuid())
+  plan     Plan   @relation(fields: [planId], references: [id])
+  planId   String
+  tenant   Tenant @relation(fields: [tenantId], references: [id])
+  tenantId String
+}
+
+model License {
+  id       String @id @default(uuid())
+  quantity Int    @db.SmallInt
+  reminder Int    @db.SmallInt
+  Tenant   Tenant @relation(fields: [tenantId], references: [id])
+  tenantId String @unique
+}
+
+model LicenseHistory {
+  id       String @id @default(uuid())
+  quantity Int    @db.SmallInt
+  tenant   Tenant @relation(fields: [tenantId], references: [id])
+  tenantId String
+}
+
+model UserPayment {
+  id             String          @id @default(uuid())
+  totalAmount    Decimal         @db.Money
+  amountPerDoor  Decimal         @db.Money
+  userId         String
+  email          String
+  transactionId  String
+  status         PaymentStatus   @default(pending)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  user           User            @relation(fields: [userId], references: [id])
+  paymentGateway PaymentGateway
+  paymentType    UserPaymentType @default(signup)
+}
+
+model BusinessPayment {
+  id             String              @id @default(uuid())
+  totalAmount    Decimal             @db.Money
+  tenantId       String
+  email          String
+  transactionId  String
+  status         PaymentStatus       @default(pending)
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
+  tenant         Tenant              @relation(fields: [tenantId], references: [id])
+  paymentGateway PaymentGateway
+  paymentType    BusinessPaymentType @default(signup)
+}
+
+enum PaymentStatus {
+  success
+  pending
+  failure
+  canceled
+}
+
+enum PaymentGateway {
+  stripe
+  paypal
+}
+
+enum UserPaymentType {
+  signup
+  upgrade
+  gift
+}
+
+enum BusinessPaymentType {
+  signup
+  licenseUpgrade
+  planChange
+}
+
+enum Roles {
+  SuperAdmin
+  AppAdmin
+  TenantAdmin
+  TenantUser
+  IndividualUser
+}
+
+model User {
+  id       String @id @default(uuid())
+  tenantId String
+  email    String
+  Tenant   Tenant @relation(fields: [tenantId], references: [id])
+
+  UserPayment UserPayment[]
+}
+
+model Tenant {
+  id              String            @id @default(uuid())
+  organization    String            @db.VarChar(256)
+  currentPlan     Plan              @relation(fields: [planId], references: [id])
+  domain          String            @db.VarChar()
+  status          Boolean           @db.Boolean
+  License         License?
+  Users           User[]
+  planId          String
+  PlanHistory     PlanHistory[]
+  LicenseHistory  LicenseHistory[]
+  BusinessPayment BusinessPayment[]
+}
+
+model Plan {
+  id          String        @id @default(uuid())
+  name        String        @db.VarChar(256)
+  Tenant      Tenant[]
+  PlanHistory PlanHistory[]
+}

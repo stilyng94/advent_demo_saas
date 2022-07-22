@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tenant-web-dep
+
+spec:
+  selector:
+    matchLabels:
+      app: tenant-web
+  template:
+    metadata:
+      labels:
+        app: tenant-web
+
+    spec:
+      containers:
+        - name: tenant-web
+          image: tenant-web
+          env:
+            - name: REACT_APP_BASE_URL
+              value: http://saas-advent.dev
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+          ports:
+            - containerPort: 5000

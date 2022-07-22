@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tenant-api-dep
+
+spec:
+  selector:
+    matchLabels:
+      app: tenant-api
+  template:
+    metadata:
+      labels:
+        app: tenant-api
+
+    spec:
+      containers:
+        - name: tenant-api
+          image: tenant-api
+          env:
+            - name: DATABASE_URL
+              value: postgresql://tenant:tenant-secret@localhost:5432/tenant-db
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+          ports:
+            - containerPort: 5000
+
+      initContainers:
+        - name: init-db
+          image: busybox:1.28
+          command:
+            [
+              "sh",
+              "-c",
+              "until nslookup db-srv; do echo waiting for databases; sleep 2; done;",
+            ]

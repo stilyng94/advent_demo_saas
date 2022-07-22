@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: zookeeper-dep
+spec:
+  selector:
+    matchLabels:
+      app: zookeeper-dep
+  template:
+    metadata:
+      labels:
+        app: zookeeper
+    spec:
+      containers:
+        - name: zookeeper
+          image: ibmcom/eventstreams-ce
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+          ports:
+            - containerPort: 7070
+          readinessProbe:
+            httpGet:
+              port: 7070
+              path: "/readiness"
+            initialDelaySeconds: 120
+            periodSeconds: 15
+            failureThreshold: 1
+          livenessProbe:
+            httpGet:
+              path: "/liveness"
+              port: 7070
+            initialDelaySeconds: 360
+            failureThreshold: 3
+            periodSeconds: 15

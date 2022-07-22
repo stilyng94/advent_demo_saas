@@ -1,0 +1,37 @@
+apiVersion: skaffold/v2beta28
+kind: Config
+metadata:
+  name: advent-demo-saas_shared
+build:
+  local:
+    push: false
+  artifacts:
+    - image: shared-api
+      context: shared_backend
+      sync:
+        manual:
+          - dest: .
+            src: "src/**/*.ts"
+      docker:
+        dockerfile: Dockerfile
+    - image: landing-web
+      context: landing
+      sync:
+        manual:
+          - dest: .
+            src: "src/**/*.ts"
+      docker:
+        dockerfile: Dockerfile
+    - image: admin-web
+      context: admin
+      sync:
+        manual:
+          - dest: .
+            src: "src/**/*.ts"
+      docker:
+        dockerfile: Dockerfile
+
+deploy:
+  kubectl:
+    manifests:
+      - infra/k8s/shared/*

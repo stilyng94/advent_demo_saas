@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: landing-web-dep
+  namespace: shared
+
+spec:
+  selector:
+    matchLabels:
+      app: landing-web
+  template:
+    metadata:
+      labels:
+        app: landing-web
+      namespace: shared
+
+    spec:
+      containers:
+        - name: landing-web
+          image: landing-web
+          env:
+            - name: REACT_APP_BASE_URL
+              value: http://saas-advent.dev
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+          ports:
+            - containerPort: 5000

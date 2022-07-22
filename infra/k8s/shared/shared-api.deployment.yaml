@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shared-api-dep
+  namespace: shared
+
+spec:
+  selector:
+    matchLabels:
+      app: shared-api
+  template:
+    metadata:
+      labels:
+        app: shared-api
+      namespace: shared
+
+    spec:
+      containers:
+        - name: shared-api
+          image: shared-api
+          env:
+            - name: DATABASE_URL
+              value: postgresql://shared:shared-secret@localhost:5432/shared-db
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+          ports:
+            - containerPort: 5000
+
+      initContainers:
+        - name: init-db
+          image: busybox:1.28
+          command:
+            [
+              "sh",
+              "-c",
+              "until nslookup db-srv; do echo waiting for databases; sleep 2; done;",
+            ]

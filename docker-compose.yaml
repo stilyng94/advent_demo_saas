@@ -1,0 +1,45 @@
+version: "3"
+
+services:
+  nginx-proxy:
+    image: jwilder/nginx-proxy:alpine
+    restart: always
+    container_name: nginx
+    ports:
+      - "80:80"
+      # - "443:443"
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      # - ./certs:/etc/nginx/certs:ro
+      # - ./vhost.d:/etc/nginx/vhost.d
+      # - ./html:/usr/share/nginx/html
+      # - ./conf.d:/etc/nginx/conf.d
+
+
+  web:
+    build:
+      context: ./landing
+      dockerfile: Dockerfile
+    container_name: web
+    restart: always
+    env_file: ./landing/.env
+    environment:
+      - VIRTUAL_HOST=saas-advent.dev
+      - VIRTUAL_PATH=/
+    ports:
+      - "5001:80"
+
+  # client:
+  #   build:
+  #     context: ./client
+  #     dockerfile: Dockerfile
+  #   container_name: client
+  #   restart: always
+  #   env_file: ./client/.env
+  #   environment:
+  #     - VIRTUAL_HOST=*.saas-advent.dev
+  #     - VIRTUAL_PATH=/
+  #     - VIRTUAL_PORT=5002
+  #   ports:
+  #     - "5002:80"
+
